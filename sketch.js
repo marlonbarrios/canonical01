@@ -10,6 +10,9 @@ let capture;
 let videoPlayback;
 let go = false;
 
+const rows = 10; // Fixed number of rows
+const cols = 12; // Fixed number of columns
+
 function setup() {
   // Create canvas to cover the entire window
   let canvas = createCanvas(windowWidth, windowHeight);
@@ -48,17 +51,23 @@ function draw() {
     }
   }
 
-  var w = 80;
-  var h = 60;
+  // Calculate the width and height of each grid cell based on canvas size
+  var w = width / cols;
+  var h = height / rows;
   var x = 0;
   var y = 0;
+
+  // Loop through the snapshots and place them in the grid
   for (var i = 0; i < snapShots.length; i++) {
     var index = (i + frameCount) % snapShots.length;
     image(snapShots[index], x, y, w, h);
-    x = x + w;
-    if (x > width) {
+    x += w;
+    if (x >= width) {
       x = 0;
-      y = y + h;
+      y += h;
+    }
+    if (y >= height) {
+      break; // Ensure we don't exceed the available rows
     }
   }
 }
