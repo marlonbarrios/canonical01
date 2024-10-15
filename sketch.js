@@ -1,172 +1,69 @@
-// Canonical: part of Duets in Latent Spaces
-// Concept and programming by Marlon Barrios Solano
+# Code Explanation: Canonical - Part of Duets in Latent Spaces
 
-// Variables for snapshots and controlling playback/recording
-var snapShots = []; // Array to store webcam snapshots
-var counter = 0; // Counter to track the current snapshot
-var total = 131; // Total number of snapshots to cycle through
-var song; // Variable to hold the sound file
-let videoRecorder; // Variable to hold the video recorder object
-let capture; // Variable to hold the webcam capture
-let videoPlayback; // Variable to hold the playback video element
-let go = false; // Flag to indicate when the webcam feed is ready
+This document provides an explanation of the key parts of the code used in the project "Canonical: Part of Duets in Latent Spaces."
 
-// Constants for grid layout
-const rows = 10; // Fixed number of rows for the grid
-const cols = 12; // Fixed number of columns for the grid
+## Global Variables
 
-// Setup function runs once when the program starts
-function setup() {
-  // Create a canvas that covers the entire window
-  let canvas = createCanvas(windowWidth, windowHeight);
+- **snapShots**: This array stores snapshots captured from the user's webcam.
+- **counter**: Tracks the current snapshot in the cycle of images.
+- **total**: The total number of snapshots (131) that will be cycled through.
+- **song**: Stores the loaded sound file (`canon-in-d.mp3`) to be played during interaction.
+- **videoRecorder**: This variable holds the instance of the p5.js video recorder used to record the canvas and webcam feed.
+- **capture**: Stores the live feed from the user's webcam.
+- **videoPlayback**: Used to store and manage playback of the recorded video.
+- **go**: A boolean flag to indicate when the webcam is ready to start capturing snapshots.
 
-  // Load the sound file and call the 'loaded' function when ready
-  song = loadSound("canon-in-d.mp3", loaded);
+## Setup Function
 
-  // Set the background color to black
-  background(0);
+The `setup()` function runs once at the start of the program. It performs several initialization tasks:
 
-  // Start capturing the webcam video, with 'ready' as the callback when ready
-  capture = createCapture(VIDEO, ready);
+- **Canvas Creation**: The canvas is created to fill the entire window using `createCanvas(windowWidth, windowHeight)`.
+- **Sound Loading**: The sound file `canon-in-d.mp3` is loaded using the `loadSound()` function. Once loaded, the `loaded()` callback is triggered.
+- **Webcam Capture**: A video capture object is created using `createCapture(VIDEO, ready)`, and the webcam feed is hidden from view using `capture.hide()`. This feed is displayed on the canvas through the `draw()` function.
+- **Video Recorder**: A p5.js `VideoRecorder` instance is initialized, and a callback is set to handle when the recorded video is ready for playback.
 
-  // Set the capture resolution for the webcam feed
-  capture.size(160, 120);
+## Window Resizing
 
-  // Hide the capture element (so it only shows in the canvas)
-  capture.hide();
+The `windowResized()` function ensures that the canvas dynamically adjusts to changes in the window size by calling `resizeCanvas(windowWidth, windowHeight)`.
 
-  // Initialize a new video recorder instance to record the canvas
-  videoRecorder = new p5.VideoRecorder();
+## Draw Function (Main Loop)
 
-  // Set the callback to handle the video once the recording is ready
-  videoRecorder.onFileReady = showPlayback;
-}
+The `draw()` function is the core of the program and is called repeatedly to update the canvas:
 
-// Function to handle resizing the canvas when the window size changes
-function windowResized() {
-  // Dynamically resize the canvas to always cover the entire window
-  resizeCanvas(windowWidth, windowHeight);
-}
+- **Snapshot Capture**: If the webcam is ready (when `go` is `true`), frames from the webcam are captured and stored in the `snapShots[]` array.
+- **Grid Layout**: The webcam frames (snapshots) are displayed in a grid of 10 rows by 12 columns, which are dynamically calculated based on the canvas size. The width and height of each grid cell are determined by dividing the canvas width by 12 (columns) and the canvas height by 10 (rows).
+- **Frame Cycling**: The program continuously cycles through the captured frames, creating a looping animation where old frames are overwritten as new ones are captured.
 
-// Function called when the sound file is loaded
-function loaded() {
-  console.log('Sound file loaded');
-}
+## Key Controls
 
-// Function called when the webcam capture is ready
-function ready() {
-  go = true; // Set the flag to true to start capturing snapshots
-}
+The program uses key-based controls for interaction:
 
-// The draw function runs in a loop and updates the canvas
-function draw() {
-  // If the webcam is ready, capture the frame and store it in the array
-  if (go) {
-    snapShots[counter] = capture.get(); // Capture the current frame
-    counter++; // Increment the counter
-    if (counter == total) {
-      counter = 0; // Loop back to the start when reaching the total number of snapshots
-    }
-  }
+1. **Play/Stop Music (`p`)**: When the `p` key is pressed, the `togglePlaying()` function is called to either play or stop the background music. The music is controlled using the p5.js `sound` library.
+   
+2. **Start Recording (`r`)**: Pressing the `r` key starts recording the current canvas and webcam feed. This action triggers the `startRecording()` function, which calls `videoRecorder.start()`.
 
-  // Calculate the width and height of each cell based on the canvas size
-  var w = width / cols; // Cell width is canvas width divided by the number of columns
-  var h = height / rows; // Cell height is canvas height divided by the number of rows
-  var x = 0; // Starting x-coordinate for the first cell
-  var y = 0; // Starting y-coordinate for the first cell
+3. **Stop Recording (`s`)**: The `s` key stops the recording process via the `stopRecording()` function, which invokes `videoRecorder.stop()`.
 
-  // Loop through the snapshots array and display each one in the grid
-  for (var i = 0; i < snapShots.length; i++) {
-    var index = (i + frameCount) % snapShots.length; // Get the current snapshot to display
-    image(snapShots[index], x, y, w, h); // Draw the snapshot on the canvas
+4. **Download Video (`d`)**: Pressing the `d` key downloads the recorded video using the `downloadVideo()` function. This is done by calling `videoRecorder.save()`.
 
-    // Update the x-coordinate to move to the next column
-    x += w;
+5. **Play Recorded Video (`q`)**: The `q` key plays the recorded video through the `playVideo()` function, which plays back the video created by the recorder.
 
-    // If the x-coordinate exceeds the canvas width, reset it and move to the next row
-    if (x >= width) {
-      x = 0;
-      y += h; // Move down to the next row
-    }
+## Sound and Playback Functions
 
-    // Stop the loop if the y-coordinate exceeds the canvas height (i.e., no more rows)
-    if (y >= height) {
-      break;
-    }
-  }
-}
+- **togglePlaying()**: This function handles playing and stopping the background music. It checks if the sound file is already playing and either starts or stops it accordingly.
+  
+- **startRecording()**: This function triggers the video recording by calling `videoRecorder.start()` and logs the start of recording to the console.
 
-// Function to handle key presses for controlling the interface
-function keyPressed() {
-  // 'p' to toggle playing or stopping the sound
-  if (key === 'p') {
-    togglePlaying();
-  }
+- **stopRecording()**: Stops the current recording by calling `videoRecorder.stop()`.
 
-  // 'r' to start recording the canvas and sound
-  if (key === 'r') {
-    startRecording();
-  }
+- **playVideo()**: Plays the recorded video if it is available.
 
-  // 's' to stop recording
-  if (key === 's') {
-    stopRecording();
-  }
+- **downloadVideo()**: This function allows the user to download the recorded video by calling `videoRecorder.save()`.
 
-  // 'd' to download the recorded video
-  if (key === 'd') {
-    downloadVideo();
-  }
+## Video Playback
 
-  // 'q' to play the recorded video
-  if (key === 'q') {
-    playVideo();
-  }
-}
+When the recording process is completed, the `showPlayback()` function is triggered. This function creates a new video element using the URL of the recorded video and hides it from view (it will be displayed on the canvas).
 
-// Function to toggle playing or stopping the sound
-function togglePlaying() {
-  if (!song.isPlaying()) {
-    song.play(); // Play the song if it's not currently playing
-    song.setVolume(0.5); // Set the volume to 50%
-    console.log("Music Playing");
-  } else {
-    song.stop(); // Stop the song if it's already playing
-    console.log("Music Stopped");
-  }
-}
+---
 
-// Function to start recording the canvas and sound
-function startRecording() {
-  console.log("Recording started");
-  videoRecorder.start(); // Start the video recorder
-}
-
-// Function to stop recording
-function stopRecording() {
-  console.log("Recording stopped");
-  videoRecorder.stop(); // Stop the video recorder
-}
-
-// Function to play the recorded video
-function playVideo() {
-  if (videoPlayback) {
-    videoPlayback.play(); // Play the recorded video
-    console.log("Playing recorded video");
-  }
-}
-
-// Function to download the recorded video file
-function downloadVideo() {
-  if (videoRecorder.url) {
-    videoRecorder.save("canonical"); // Save the video file with the name 'canonical'
-    console.log("Video downloaded");
-  }
-}
-
-// Function to handle the video playback once recording is ready
-function showPlayback() {
-  videoPlayback = createVideo(videoRecorder.url); // Create a video element with the recorded video
-  videoPlayback.hide(); // Hide the video element (it will be displayed on the canvas)
-  console.log("Recording ready for playback");
-}
+This explanation covers the key sections of the code and how the different components work together to capture webcam frames, play music, and allow users to record, download, and play back video.
