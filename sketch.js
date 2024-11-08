@@ -72,14 +72,26 @@ function draw() {
   // Calculate the width and height of each cell based on the canvas size
   var w = width / cols; // Cell width is canvas width divided by the number of columns
   var h = height / rows; // Cell height is canvas height divided by the number of rows
+  var x = 0; // Starting x-coordinate for the first cell
+  var y = 0; // Starting y-coordinate for the first cell
 
-  // Loop through the rows and columns to display the snapshots in the grid
-  for (var row = 0; row < rows; row++) {
-    for (var col = 0; col < cols; col++) {
-      var index = (row * cols + col + frameCount) % snapShots.length; // Get the snapshot index with a loop
-      if (snapShots[index]) {
-        image(snapShots[index], col * w, row * h, w, h); // Draw the snapshot in the appropriate cell
-      }
+  // Loop through the snapshots array and display each one in the grid
+  for (var i = 0; i < snapShots.length; i++) {
+    var index = (i + frameCount) % snapShots.length; // Get the current snapshot to display
+    image(snapShots[index], x, y, w, h); // Draw the snapshot on the canvas
+
+    // Update the x-coordinate to move to the next column
+    x += w;
+
+    // If the x-coordinate exceeds the canvas width, reset it and move to the next row
+    if (x >= width) {
+      x = 0;
+      y += h; // Move down to the next row
+    }
+
+    // Stop the loop if the y-coordinate exceeds the canvas height (i.e., no more rows)
+    if (y >= height) {
+      break;
     }
   }
 }
@@ -147,4 +159,14 @@ function playVideo() {
 // Function to download the recorded video file
 function downloadVideo() {
   if (videoRecorder.url) {
-    video​⬤
+    videoRecorder.save("canonical"); // Save the video file with the name 'canonical'
+    console.log("Video downloaded");
+  }
+}
+
+// Function to handle the video playback once recording is ready
+function showPlayback() {
+  videoPlayback = createVideo(videoRecorder.url); // Create a video element with the recorded video
+  videoPlayback.hide(); // Hide the video element (it will be displayed on the canvas)
+  console.log("Recording ready for playback");
+}
