@@ -1,7 +1,11 @@
 # Canonical of a Metalogical Structure
+<img width="1405" alt="Screenshot 2025-03-09 at 5 51 12 PM" src="https://github.com/user-attachments/assets/a264d3ff-61be-4f3f-8329-04609d31f922" />
+
 
 *Concept and programming by Marlon Barrios Solano*  
 *Part of Duets in Latent Space*
+
+![399571283-f5584ea8-a7df-4440-a683-060a961c7de7](https://github.com/user-attachments/assets/7ab3c7ef-5131-41e5-acd9-00a72ad5ab71)
 
 ## Overview
 
@@ -11,6 +15,7 @@
 - **Metalogical Structure:** Emphasizing an underlying framework that governs the organization and transformation of data—in this case, the self-referential logic used to assemble and display snapshots in a dynamic grid. This meta-level organization evokes a deeper conceptual order inherent in both art and logic.
 
 The piece creates a dialogue between the recurring patterns of Pachelbel’s Canon and the evolving mosaic of webcam captures, forming a unique sensory experience.
+<img width="1405" alt="Screenshot 2025-03-09 at 5 51 24 PM" src="https://github.com/user-attachments/assets/0ae363dc-3300-4641-b366-6d3060fdd9a6" />
 
 ## Live Demo
 
