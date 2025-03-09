@@ -1,22 +1,106 @@
-# Canonical: Part of Duets in Latent Spaces
+Below is the updated README with links to the live app and the YouTube video:
 
-This project is an interactive generative art piece that captures webcam snapshots and plays them in a looping grid, combined with sound and recording functionality. Concept and programming by Marlon Barrios Solano.
+Canonical of a Metalogical Structure
 
-## Table of Contents
-- [Introduction](#introduction)
-- [Features](#features)
-- [Setup](#setup)
-- [Usage](#usage)
-  - [Controls](#controls)
-- [How It Works](#how-it-works)
-- [Dependencies](#dependencies)
+Concept and programming by Marlon Barrios Solano
+Part of Duets in Latent Space
 
-## Introduction
-"Canonical" is part of the "Duets in Latent Spaces" series. This piece captures live webcam video, arranges it into a grid of 10 rows and 12 columns, and plays the "Canon in D" musical composition. The user can interact with the piece by recording video snapshots and sound, and later download or play the recorded session.
+Overview
 
-## Features
-- **Webcam Capture:** Captures live video from your webcam.
-- **Grid Display:** Displays the captured video frames in a grid of 10 rows by 12 columns.
-- **Music Playback:** Plays "Canon in D" during the interaction.
-- **Recording:** Records both the video frames and audio into a downloadable video file.
-- **Playback:** Play back the recorded session.
+Canonical of a Metalogical Structure is an interactive audiovisual project built using p5.js. This work merges real-time webcam imagery with the timeless structure of Pachelbel’s Canon in D. Its title reflects two core ideas:
+	•	Canonical: Referring to a recognized, standard pattern or model. Here, it describes the fixed, structured way in which snapshots are captured, arranged, and replayed.
+	•	Metalogical Structure: Emphasizing an underlying framework that governs the organization and transformation of data—in this case, the self-referential logic used to assemble and display snapshots in a dynamic grid. This meta-level organization evokes a deeper conceptual order inherent in both art and logic.
+
+The piece creates a dialogue between the recurring patterns of Pachelbel’s Canon and the evolving mosaic of webcam captures, forming a unique sensory experience.
+
+Live Demo
+	•	View the Live App
+	•	Watch the YouTube Demo
+
+Features
+	•	Live Webcam Capture:
+Continuously captures frames from your webcam and stores them as snapshots.
+	•	Dynamic Grid Display:
+Organizes the snapshots into a fixed grid (10 rows x 12 columns) that cycles through the captured images, creating a constantly evolving visual mosaic that reflects a canonical order.
+	•	Audio Integration:
+Utilizes Pachelbel’s Canon in D—a piece celebrated for its layered, repeating progression—to underscore the visual rhythm and reinforce the notion of an underlying, timeless structure.
+	•	Video Recording:
+Records the canvas (including snapshots and audio) using a built-in video recorder. Users can play back or download the resulting video.
+	•	Interactive Controls:
+Keyboard commands enable you to:
+	•	P: Toggle audio playback.
+	•	R: Start recording the canvas and audio.
+	•	S: Stop recording.
+	•	D: Download the recorded video.
+	•	Q: Play the recorded video.
+
+How It Works
+	1.	Setup:
+	•	A full-window canvas is created.
+	•	The audio file (“canon-in-d.mp3”), inspired by Pachelbel’s Canon, is loaded.
+	•	The webcam feed is initiated, with frames continuously captured into an array.
+	•	A video recorder is set up to capture the evolving canvas.
+	2.	Snapshot Capture & Grid Display:
+	•	As soon as the webcam feed is active, snapshots are taken at regular intervals.
+	•	These snapshots are arranged into a structured grid, with the display updating in a cyclic, canonical pattern.
+	3.	Audio & Structure:
+	•	The piece leverages the formal structure of Pachelbel’s Canon, whose repeating and interweaving themes resonate with the grid’s cyclic display of images.
+	•	The music underscores the visual rhythm, emphasizing the idea of an ordered, yet ever-changing metalogical structure.
+	4.	Recording & Playback:
+	•	Users can record the entire session—including both visuals and audio—and later play back or download the recording.
+
+Installation and Usage
+
+Prerequisites
+	•	A modern web browser.
+	•	The p5.js library and the p5.VideoRecorder module (included via script tags or module imports).
+
+Running the Project
+	1.	Clone the Repository:
+Download or clone the repository to your local machine.
+	2.	Open the Project:
+Open the index.html file in your web browser.
+	3.	Interact with the Experience:
+	•	Press P to toggle the music (Pachelbel’s Canon in D).
+	•	Press R to start recording the visual and audio performance.
+	•	Press S to stop recording.
+	•	Press D to download the recorded video.
+	•	Press Q to play back the recorded video.
+
+Code Structure
+	•	Global Variables:
+Manages snapshots, counters, audio file, video recorder, and webcam capture.
+	•	Setup Function:
+Initializes the canvas, loads the audio, and sets up the webcam and video recorder.
+	•	Draw Loop:
+Continuously captures webcam frames, stores them, and displays them in a grid that evolves over time.
+	•	Event Handlers:
+	•	keyPressed(): Listens for keyboard inputs to control audio and recording functions.
+	•	Additional functions manage starting/stopping recording, toggling audio, and handling video playback and download.
+
+License
+
+This project is licensed under the MIT License.
+© Marlon Barrios Solano, 2025
+
+MIT License
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+This updated README includes links to the live app and a YouTube demo, as well as the necessary MIT license and proper attribution to Marlon Barrios Solano as part of Duets in Latent Space.
