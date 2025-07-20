@@ -6,11 +6,14 @@
 const rows = 10;
 const cols = 12;
 const total = rows * cols; // Total snapshots needed to fill the grid delay
+const captureWidth = 160;
+const captureHeight = 120;
 
 // --- State Variables ---
 let snapShots = [];
 let capture;
 let song;
+let flippedCapture; // Graphics buffer for flipping the camera
 
 let counter = 0; // Tracks the write position in our circular buffer
 let go = false; // Flag for when webcam is ready
@@ -29,8 +32,11 @@ function setup() {
     go = true;
     console.log("Webcam ready. Filling buffer...");
   });
-  capture.size(160, 120);
+  capture.size(captureWidth, captureHeight);
   capture.hide();
+
+  // **NEW**: Create a graphics buffer to handle the horizontal flip
+  flippedCapture = createGraphics(captureWidth, captureHeight);
 
   // Load sound file (ensure 'canon-in-d.mp3' is in your project folder)
   song = loadSound("canon-in-d.mp3", () => console.log('Sound file loaded.'));
@@ -47,12 +53,20 @@ function windowResized() {
 function draw() {
   background(0);
 
-  // --- Step 1: Continuously fill the circular buffer with new frames ---
+  // --- Step 1: Continuously fill the circular buffer with new, flipped frames ---
   if (go && capture.width > 0) {
-    snapShots[counter] = capture.get(); // Store the current frame
+    // **NEW**: Flip the capture image horizontally
+    flippedCapture.push();
+    flippedCapture.translate(captureWidth, 0); // Move to the right edge
+    flippedCapture.scale(-1, 1); // Flip horizontally
+    flippedCapture.image(capture, 0, 0, captureWidth, captureHeight); // Draw the original capture
+    flippedCapture.pop();
+
+    // Store the *flipped* image in our snapshots array
+    snapShots[counter] = flippedCapture.get();
     counter = (counter + 1) % total; // Move to the next slot
 
-    // The buffer is considered "ready" once it has been completely filled one time.
+    // The buffer is "ready" once it has been completely filled one time.
     if (!isBufferReady && snapShots.length === total) {
       isBufferReady = true;
       console.log("Buffer is full. Displaying the sequential delay.");
@@ -66,22 +80,9 @@ function draw() {
 
     for (let j = 0; j < rows; j++) {
       for (let i = 0; i < cols; i++) {
-        
-        // --- CORE LOGIC FOR BOTTOM-TO-TOP DELAY ---
-
-        // 1. Calculate a "delay amount" for each cell.
-        // We want the most delay at the top-left (value: total-1)
-        // and the least delay at the bottom-right (value: 0).
+        // --- CORE LOGIC FOR BOTTOM-TO-TOP DELAY (Unchanged) ---
         const delayAmount = ((rows - 1 - j) * cols) + ((cols - 1 - i));
-
-        // 2. Determine the index of the newest frame in our buffer.
-        // The 'counter' variable points to the *oldest* frame slot,
-        // so the newest frame is the one right behind it.
         const newestFrameIndex = (counter - 1 + total) % total;
-
-        // 3. Find the correct snapshot by subtracting the delay from the newest frame.
-        // This makes cells with a large 'delayAmount' go further back in time.
-        // Adding 'total' before the modulo (%) ensures the result is always positive.
         const snapshotIndex = (newestFrameIndex - delayAmount + total) % total;
         
         if (snapShots[snapshotIndex]) {
@@ -90,7 +91,7 @@ function draw() {
       }
     }
   } else {
-    // Display a loading message until the buffer is full
+    // Display a loading message
     fill(255);
     textAlign(CENTER, CENTER);
     textSize(24);
@@ -99,12 +100,16 @@ function draw() {
   }
 }
 
-
-// --- User Interaction Functions (Unchanged) ---
+// --- User Interaction Functions ---
 
 function keyPressed() {
+  // **MODIFIED**: Check for spacebar for play/pause
+  if (key === ' ') {
+    togglePlaying();
+    return; // Prevent other keys from being checked
+  }
+
   switch (key.toLowerCase()) {
-    case 'p': togglePlaying(); break;
     case 'r': startRecording(); break;
     case 's': stopRecording(); break;
     case 'd': downloadVideo(); break;
@@ -116,10 +121,10 @@ function togglePlaying() {
   if (!song.isPlaying()) {
     song.play();
     song.setVolume(0.5);
-    console.log("Music Playing");
+    console.log("Music Playing (Press SPACEBAR to stop)");
   } else {
     song.stop();
-    console.log("Music Stopped");
+    console.log("Music Stopped (Press SPACEBAR to play)");
   }
 }
 
