@@ -1,20 +1,20 @@
 // Canonical: part of Duets in Latent Spaces
 // Concept and programming by Marlon Barrios Solano
-// Code fixed and refined by Gemini
+// Code fixed and refined by Gemini for a clear, sequential bottom-to-top delay
 
 // --- Configuration ---
-const rows = 10; // Fixed number of rows for the grid
-const cols = 12; // Fixed number of columns for the grid
-const total = rows * cols; // Total number of snapshots to match the grid
+const rows = 10;
+const cols = 12;
+const total = rows * cols; // Total snapshots needed to fill the grid delay
 
 // --- State Variables ---
-let snapShots = []; // Array to store webcam snapshots
-let capture; // Webcam capture object
-let song; // Sound file
+let snapShots = [];
+let capture;
+let song;
 
-let counter = 0; // Counter to track the current snapshot being written
-let go = false; // Flag to indicate when the webcam feed is ready
-let isBufferReady = false; // Flag to check if the snapshot buffer is full
+let counter = 0; // Tracks the write position in our circular buffer
+let go = false; // Flag for when webcam is ready
+let isBufferReady = false; // Flag to start drawing only when buffer is full
 
 // --- Recording Variables ---
 let videoRecorder;
@@ -26,18 +26,16 @@ function setup() {
 
   // Initialize webcam capture
   capture = createCapture(VIDEO, () => {
-    go = true; // Set the ready flag when the camera stream starts
-    console.log("Webcam ready.");
+    go = true;
+    console.log("Webcam ready. Filling buffer...");
   });
   capture.size(160, 120);
   capture.hide();
 
-  // Load the sound file. Make sure 'canon-in-d.mp3' is in your project folder.
-  song = loadSound("canon-in-d.mp3", () => {
-    console.log('Sound file loaded.');
-  });
+  // Load sound file (ensure 'canon-in-d.mp3' is in your project folder)
+  song = loadSound("canon-in-d.mp3", () => console.log('Sound file loaded.'));
 
-  // Initialize the video recorder
+  // Initialize video recorder
   videoRecorder = new p5.VideoRecorder();
   videoRecorder.onFileReady = showPlayback;
 }
@@ -49,16 +47,15 @@ function windowResized() {
 function draw() {
   background(0);
 
-  // --- Step 1: Continuously capture frames to fill our buffer ---
-  // We check capture.width to ensure the video has fully initialized
+  // --- Step 1: Continuously fill the circular buffer with new frames ---
   if (go && capture.width > 0) {
     snapShots[counter] = capture.get(); // Store the current frame
-    counter = (counter + 1) % total; // Increment counter and loop back
+    counter = (counter + 1) % total; // Move to the next slot
 
-    // Check if the buffer has been filled for the first time
-    if (!isBufferReady && counter === 0 && snapShots.length >= total) {
+    // The buffer is considered "ready" once it has been completely filled one time.
+    if (!isBufferReady && snapShots.length === total) {
       isBufferReady = true;
-      console.log("Snapshot buffer is full. Starting animation.");
+      console.log("Buffer is full. Displaying the sequential delay.");
     }
   }
 
@@ -67,54 +64,51 @@ function draw() {
     const w = width / cols;
     const h = height / rows;
 
-    // Loop through each cell of the grid from top to bottom
     for (let j = 0; j < rows; j++) {
       for (let i = 0; i < cols; i++) {
+        
+        // --- CORE LOGIC FOR BOTTOM-TO-TOP DELAY ---
 
-        // **FIX:** Calculate an index that reverses the vertical order.
-        // This makes the bottom row (j=9) correspond to a recent frame (less delay)
-        // and the top row (j=0) correspond to an older frame (more delay).
-        const reversedRow = (rows - 1) - j;
-        const timeDelayIndex = reversedRow * cols + i;
+        // 1. Calculate a "delay amount" for each cell.
+        // We want the most delay at the top-left (value: total-1)
+        // and the least delay at the bottom-right (value: 0).
+        const delayAmount = ((rows - 1 - j) * cols) + ((cols - 1 - i));
 
-        // Combine with frameCount to create the animated ripple effect
-        // The '% total' ensures the index wraps around within the array's bounds.
-        const snapshotIndex = (frameCount + timeDelayIndex) % total;
+        // 2. Determine the index of the newest frame in our buffer.
+        // The 'counter' variable points to the *oldest* frame slot,
+        // so the newest frame is the one right behind it.
+        const newestFrameIndex = (counter - 1 + total) % total;
 
-        // Draw the corresponding snapshot in the grid cell
+        // 3. Find the correct snapshot by subtracting the delay from the newest frame.
+        // This makes cells with a large 'delayAmount' go further back in time.
+        // Adding 'total' before the modulo (%) ensures the result is always positive.
+        const snapshotIndex = (newestFrameIndex - delayAmount + total) % total;
+        
         if (snapShots[snapshotIndex]) {
           image(snapShots[snapshotIndex], i * w, j * h, w, h);
         }
       }
     }
   } else {
-    // Show a loading message until the buffer is full
+    // Display a loading message until the buffer is full
     fill(255);
     textAlign(CENTER, CENTER);
     textSize(24);
-    text('Loading camera buffer...', width / 2, height / 2);
+    const loadedPercentage = snapShots.length / total * 100;
+    text(`Loading... ${floor(loadedPercentage)}%`, width / 2, height / 2);
   }
 }
 
-// --- User Interaction Functions ---
+
+// --- User Interaction Functions (Unchanged) ---
 
 function keyPressed() {
   switch (key.toLowerCase()) {
-    case 'p':
-      togglePlaying();
-      break;
-    case 'r':
-      startRecording();
-      break;
-    case 's':
-      stopRecording();
-      break;
-    case 'd':
-      downloadVideo();
-      break;
-    case 'q':
-      playVideo();
-      break;
+    case 'p': togglePlaying(); break;
+    case 'r': startRecording(); break;
+    case 's': stopRecording(); break;
+    case 'd': downloadVideo(); break;
+    case 'q': playVideo(); break;
   }
 }
 
@@ -122,10 +116,10 @@ function togglePlaying() {
   if (!song.isPlaying()) {
     song.play();
     song.setVolume(0.5);
-    console.log("Music Playing (Press 'p' to stop)");
+    console.log("Music Playing");
   } else {
     song.stop();
-    console.log("Music Stopped (Press 'p' to play)");
+    console.log("Music Stopped");
   }
 }
 
@@ -152,7 +146,7 @@ function playVideo() {
     videoPlayback.play();
     console.log("Playing recorded video");
   } else {
-    console.log("No video has been recorded yet. Press 'r' to record, then 's' to stop.");
+    console.log("No video recorded yet. Press 'r' then 's'.");
   }
 }
 
@@ -161,12 +155,12 @@ function downloadVideo() {
     videoRecorder.save("canonical_delay_video");
     console.log("Video download initiated.");
   } else {
-     console.log("No video has been recorded yet. Press 'r' to record, then 's' to stop.");
+     console.log("No video recorded yet. Press 'r' then 's'.");
   }
 }
 
 function showPlayback() {
   videoPlayback = createVideo(videoRecorder.url);
-  videoPlayback.hide(); // Hide the default video element
-  console.log("Recording ready for playback. Press 'q' to play or 'd' to download.");
+  videoPlayback.hide();
+  console.log("Recording ready. Press 'q' to play or 'd' to download.");
 }
